@@ -1,11 +1,13 @@
 import os
 import pandas as pd
 
+# hårdkodade sökvägar
 INPUT_FILE = "data/orders.csv"
 OUTPUT_FOLDER = "output"
 
 print("Startar orderrapport")
 
+# programflöde ligger alla i samma try-block -> funktioner för varje steg
 try:
     data = pd.read_csv(INPUT_FILE)
 
@@ -21,11 +23,13 @@ try:
         "returned",
     }
 
+    # raise Exception("Fel data") och det yttre except Exception as error: print(...)...
     if not required.issubset(data.columns):
         raise Exception("Fel data")
 
     print("Läste in", len(data), "rader")
 
+    # hantering av missing values --> funktion
     data["region"] = data["region"].fillna("Unknown").astype(str).str.strip().str.title()
     data["product_category"] = (
         data["product_category"]
@@ -59,22 +63,29 @@ try:
         .isin(["true", "yes", "1", "ja"])
     )
 
+    # transformation --> funktioner 
+
+    # order value
     data["order_value"] = (
         data["quantity"] * data["unit_price"]
     )
 
+    # discount value
     data["discounted_value"] = (
         data["order_value"] * (1 - data["discount"])
     )
 
+    # total salses
     total_sales = round(
         data["discounted_value"].sum(),
         2,
     )
 
+    # antal unika ordrar/returer
     number_of_orders = data["order_id"].nunique()
     number_of_returns = int(data["returned"].sum())
 
+    # skapar en overview som dataframe
     overview = pd.DataFrame(
         {
             "metric": [
@@ -89,7 +100,7 @@ try:
             ],
         }
     )
-
+    # gör om dataframe till csv och sparar i output 
     overview.to_csv(
         os.path.join(
             OUTPUT_FOLDER,
@@ -100,6 +111,7 @@ try:
 
     print("Sparade overview.csv")
 
+    # result 1, 2 och returns_category gör i princip samma sak, soretar och sparar till csv --> skriv om till en funktion
     result1 = (
         data.groupby(
             "product_category",
