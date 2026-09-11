@@ -5,5 +5,5 @@ from pathlib import Path
 class ReportConfig:
     """Sökvägar som behövs för att skapa rapporten"""
 
-    input_path: Path = Path("order_report_program/data/orders.csv")
-    output_dir: Path = Path("order_report_program/output")                      
+    input_path: Path = Path("data/orders.csv")
+    output_dir: Path = Path("/output")                      
